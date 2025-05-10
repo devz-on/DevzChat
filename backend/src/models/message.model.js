@@ -18,6 +18,9 @@ const messageSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    imagePublicId: {
+      type: String, // 👈 Add this to store Cloudinary image public_id
+    },
   },
   { timestamps: true }
 );
