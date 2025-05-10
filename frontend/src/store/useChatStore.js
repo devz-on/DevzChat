@@ -45,25 +45,32 @@ export const useChatStore = create((set, get) => ({
   },
 
   subscribeToMessages: () => {
-    const { selectedUser } = get();
-    if (!selectedUser) return;
+  const { selectedUser } = get();
+  if (!selectedUser) return;
 
-    const socket = useAuthStore.getState().socket;
+  const socket = useAuthStore.getState().socket;
 
-    socket.on("newMessage", (newMessage) => {
-      const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
-      if (!isMessageSentFromSelectedUser) return;
+  socket.on("newMessage", (newMessage) => {
+    const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
+    if (!isMessageSentFromSelectedUser) return;
 
-      set({
-        messages: [...get().messages, newMessage],
-      });
+    set({
+      messages: [...get().messages, newMessage],
     });
-  },
+  });
+
+  socket.on("messageDeleted", (messageId) => {
+    set((state) => ({
+      messages: state.messages.filter((msg) => msg._id !== messageId),
+    }));
+  });
+},
 
   unsubscribeFromMessages: () => {
-    const socket = useAuthStore.getState().socket;
-    socket.off("newMessage");
-  },
+  const socket = useAuthStore.getState().socket;
+  socket.off("newMessage");
+  socket.off("messageDeleted");
+},
 
   deleteMessage: async (id) => {
   try {
