@@ -1,11 +1,11 @@
 import { useChatStore } from "../store/useChatStore";
-import { useEffect, useRef } from "react";
-
+import { useEffect, useRef, useState } from "react";
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { useAuthStore } from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
+import { axiosInstance } from "../lib/axios"; // Import your axios instance
 
 const ChatContainer = () => {
   const {
@@ -15,13 +15,14 @@ const ChatContainer = () => {
     selectedUser,
     subscribeToMessages,
     unsubscribeFromMessages,
+    deleteMessage, // Assuming deleteMessage function is in the store
   } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     getMessages(selectedUser._id);
-
     subscribeToMessages();
 
     return () => unsubscribeFromMessages();
@@ -33,7 +34,19 @@ const ChatContainer = () => {
     }
   }, [messages]);
 
-  if (isMessagesLoading) {
+  const handleDeleteMessage = async (messageId) => {
+    try {
+      setLoading(true);
+      await axiosInstance.delete(`/messages/${messageId}`);
+      deleteMessage(messageId); // Update your store
+    } catch (error) {
+      console.error("Error deleting message:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (isMessagesLoading || loading) {
     return (
       <div className="flex-1 flex flex-col overflow-auto">
         <ChatHeader />
@@ -54,7 +67,7 @@ const ChatContainer = () => {
             className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
             ref={messageEndRef}
           >
-            <div className=" chat-image avatar">
+            <div className="chat-image avatar">
               <div className="size-10 rounded-full border">
                 <img
                   src={
@@ -81,6 +94,14 @@ const ChatContainer = () => {
               )}
               {message.text && <p>{message.text}</p>}
             </div>
+            {message.senderId === authUser._id && (
+              <button
+                onClick={() => handleDeleteMessage(message._id)}
+                className="text-xs text-red-500 mt-1 self-end"
+              >
+                Delete
+              </button>
+            )}
           </div>
         ))}
       </div>
@@ -89,4 +110,5 @@ const ChatContainer = () => {
     </div>
   );
 };
+
 export default ChatContainer;
