@@ -91,7 +91,8 @@ export const deleteMessage = async (req, res) => {
 
     await Message.findByIdAndDelete(messageId);
 
-    io.to(getReceiverSocketId(message.receiverId)).emit("messageDeleted", messageId);
+    io.to(getReceiverSocketId(message.receiverId))?.emit("messageDeleted", messageId);
+    io.to(getReceiverSocketId(message.senderId))?.emit("messageDeleted", messageId);
 
     res.status(200).json({ message: "Message deleted successfully", messageId });
   } catch (error) {
