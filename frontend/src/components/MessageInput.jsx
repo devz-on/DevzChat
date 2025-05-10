@@ -70,39 +70,38 @@ const MessageInput = () => {
       )}
 
       <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-        <div className="flex-1 flex gap-2">
-          <input
-            type="text"
-            className="w-full input input-bordered rounded-lg input-sm sm:input-md"
-            placeholder="Type a message..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            ref={fileInputRef}
-            onChange={handleImageChange}
-          />
-
-          <button
-            type="button"
-            className={`btn btn-circle
-                     ${imagePreview ? "text-emerald-500" : "text-zinc-400"}`}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Image size={20} />
-          </button>
-        </div>
-        <button
-          type="submit"
-          className="btn btn-sm btn-circle"
-          disabled={!text.trim() && !imagePreview}
-        >
-          <Send size={22} />
-        </button>
-      </form>
+  <div className="flex-1 flex items-center gap-2">
+    <input
+      type="text"
+      className="w-full input input-bordered rounded-lg input-sm sm:input-md"
+      placeholder="Type a message..."
+      value={text}
+      onChange={(e) => setText(e.target.value)}
+    />
+    <input
+      type="file"
+      accept="image/*"
+      className="hidden"
+      ref={fileInputRef}
+      onChange={handleImageChange}
+    />
+    <button
+      type="button"
+      className={`btn btn-sm btn-circle
+        ${imagePreview ? "text-emerald-500" : "text-zinc-400"}`}
+      onClick={() => fileInputRef.current?.click()}
+    >
+      <Image size={20} />
+    </button>
+  </div>
+  <button
+    type="submit"
+    className="btn btn-sm btn-circle"
+    disabled={!text.trim() && !imagePreview}
+  >
+    <Send size={22} />
+  </button>
+</form>
     </div>
   );
 };
