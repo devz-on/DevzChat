@@ -41,11 +41,12 @@ export const sendMessage = async (req, res) => {
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
-    let imageUrl;
+    let imageUrl, imagePublicId;
+
     if (image) {
-      // Upload base64 image to cloudinary
       const uploadResponse = await cloudinary.uploader.upload(image);
       imageUrl = uploadResponse.secure_url;
+      imagePublicId = uploadResponse.public_id; // 👈 Save public_id for later deletion
     }
 
     const newMessage = new Message({
@@ -53,6 +54,7 @@ export const sendMessage = async (req, res) => {
       receiverId,
       text,
       image: imageUrl,
+      imagePublicId, // 👈 Include this field
     });
 
     await newMessage.save();
@@ -68,6 +70,7 @@ export const sendMessage = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 export const deleteMessage = async (req, res) => {
   try {
