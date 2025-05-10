@@ -2,6 +2,7 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
+import { deleteMessage as apiDeleteMessage } from "../api/message";
 
 export const useChatStore = create((set, get) => ({
   messages: [],
@@ -63,6 +64,17 @@ export const useChatStore = create((set, get) => ({
     const socket = useAuthStore.getState().socket;
     socket.off("newMessage");
   },
+
+  deleteMessage: async (id) => {
+  try {
+    await apiDeleteMessage(id);
+    set((state) => ({
+      messages: state.messages.filter((msg) => msg._id !== id),
+    }));
+  } catch (error) {
+    console.error("Delete message failed:", error.message);
+  }
+},
 
   setSelectedUser: (selectedUser) => set({ selectedUser }),
 }));
